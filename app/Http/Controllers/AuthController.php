@@ -61,7 +61,7 @@ class AuthController extends Controller
        if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
 
-            return redirect()->route("todo.index");
+            return redirect()->intended("/");
         }
 
         return back()->with("authError", "Invalid credentials")->withInput();

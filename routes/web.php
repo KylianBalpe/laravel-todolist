@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TodoController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,21 +15,22 @@ use App\Http\Controllers\AuthController;
 |
 */
 
-Route::get("/", function () {
-    return redirect()->route("auth.login");
+Route::middleware("auth")->get("/", function () {
+    return view("welcome");
 });
 
-Route::prefix("auth")->as("auth.")->group(function () {
+Route::middleware("guest")->prefix("auth")->as("auth.")->group(function () {
     Route::get("/login", [AuthController::class, "login"])->name("login");
     Route::get("/register", [AuthController::class, "register"])->name("register");
     Route::post("/register", [AuthController::class, "doRegister"])->name("create");
     Route::post("/login", [AuthController::class, "authenticate"])->name("authenticate");
 });
 
-Route::post("/logout", [AuthController::class, "logout"]);
+Route::post("/logout", [AuthController::class, "logout"])->name("logout");
 
-Route::prefix("todo")->as("todo.")->group(function () {
-    Route::get("/", function () {
-        return view("todo.index");
-    })->name("index");
+Route::middleware("auth")->as("todo.")->group(function () {
+    Route::get("/todo", [TodoController::class, "index"])->name("index");
+    Route::get("/todo/add", [TodoController::class, "add"])->name("add");
+    Route::post("/todo/add", [TodoController::class, "store"])->name("store");
+    Route::delete("/todo/{id}", [TodoController::class, "delete"])->name("delete");
 });
