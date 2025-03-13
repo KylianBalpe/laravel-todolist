@@ -47,8 +47,14 @@
                                             <tr>
                                                 <td class="text-center align-middle">{{ $loop->iteration }}</td>
                                                 <td class="align-middle">{{ $item->title }}</td>
-                                                <td class="align-middle">{{ $item->status }}</td>
+                                                <td class="align-middle">
+                                                    {{ $item->status === 'pending' ? 'Pending' : ($item->status === 'on_progress' ? 'On Progress' : 'Completed') }}
+                                                </td>
                                                 <td class="text-center align-middle">
+                                                    <a href="{{ route('todo.edit', $item->id) }}"
+                                                        class="btn btn-sm btn-warning">
+                                                        <span><i class="fas fa-pencil-alt mr-2"></i>Edit</span>
+                                                    </a>
                                                     <form action="{{ route('todo.delete', $item->id) }}" method="post"
                                                         class="d-inline">
                                                         @csrf

@@ -14,7 +14,7 @@ class TodoController extends Controller
     public function index(): View
     {
         $title = "Todo List";
-        $todos = Auth::user()->todos()->with('user')->get();
+        $todos = Auth::user()->todos()->with('user')->get()->sortByDesc("created_at");
         // $todos = Todo::where("user_id", Auth::user()->id)->get();
 
         return view("todo.index", compact("title", "todos"));
@@ -50,5 +50,32 @@ class TodoController extends Controller
         $todo->delete();
 
         return redirect()->route("todo.index")->with("success", "Todo deleted successfully");
+    }
+
+    public function edit($id): View
+    {
+        $title = "Edit Todo";
+        $todo = Todo::findOrFail($id);
+
+        return view("todo.edit", compact("title", "todo"));
+    }
+
+    public function update(Request $request, $id): RedirectResponse
+    {
+        $validator = Validator::make($request->all(), [
+            "title" => "required|string|min:3|max:255",
+            "status" => "required|string|in:pending,on_progress,completed",
+        ]);
+
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        $data = $validator->validated();
+
+        $todo = Todo::findOrFail($id);
+        $todo->update($data);
+
+        return redirect()->route("todo.index")->with("success", "Todo updated successfully");
     }
 }
